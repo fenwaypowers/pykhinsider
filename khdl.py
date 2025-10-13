@@ -12,6 +12,13 @@ from typing import List
 from urllib.parse import unquote
 from bs4 import BeautifulSoup
 
+HEADER = {'User-Agent': (
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+    'AppleWebKit/537.36 (KHTML, like Gecko)'
+    'Chrome/114.0.0.0 Safati/537.36'
+    ),
+    'Referer': 'https://downloads.khinsider.com/'
+    }
 logging.basicConfig(format="%(message)s", stream=sys.stdout, level=logging.INFO)
 
 
@@ -278,7 +285,7 @@ def parse_alb_page(sel_album: album):
     url = sel_album.link
 
     # Send an HTTP GET request to the URL
-    response = requests.get(url)
+    response = requests.get(url, headers = HEADER)
 
     # Check if the request was successful (status code 200)
     if response.status_code == 200:
@@ -368,7 +375,7 @@ def search():
         url = url_base + f"/search?search={query}"
 
         # Send an HTTP GET request to the URL
-        response = requests.get(url)
+        response = requests.get(url, headers = HEADER)
 
         # Check if the request was successful (status code 200)
         if response.status_code == 200:
