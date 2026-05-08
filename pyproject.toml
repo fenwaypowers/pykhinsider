@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pykhinsider"
+version = "2.0.0"
+description = "Download albums and tracks from KHInsider"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+
+authors = [
+    { name = "Fenway Powers" }
+]
+
+dependencies = [
+    "requests",
+    "beautifulsoup4",
+]
+
+[project.scripts]
+pykhinsider = "pykhinsider.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
