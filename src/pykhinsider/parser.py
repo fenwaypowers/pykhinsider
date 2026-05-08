@@ -1,49 +1,74 @@
-from bs4 import BeautifulSoup
+from urllib.parse import urljoin
+
 import requests
+from bs4 import BeautifulSoup
+from requests import RequestException
+
+from pykhinsider.constants import BASE_URL, HEADERS, REQUEST_TIMEOUT
+from pykhinsider.exceptions import InvalidURLError, ParseError
 from pykhinsider.models import Album, Track
-from pykhinsider.constants import HEADERS
 
 
 def parse_album(url: str) -> Album:
-    response = requests.get(url, headers = HEADERS)
-    
-    track_list = []
+    """
+    Parse a KHInsider album page into an Album object.
+    """
 
-    # Check if the request was successful (status code 200)
-    if response.status_code == 200:
-        # Parse the HTML content using BeautifulSoup
-        soup = BeautifulSoup(response.text, "html.parser")
+    soup = get_soup(url)
 
-        all_tr = soup.find_all("tr")
+    tracks: list[Track] = []
 
-        for tr in all_tr:
-            if "play track" in str(tr.get_text):
-                cells = tr.find_all("td")
+    for row in soup.find_all("tr"):
+        try:
+            if "play track" not in row.get_text().lower():
+                continue
 
-                # Extract the relevant data from the cells
-                title_cell = cells[3].find("a")
-                track_url = title_cell["href"]
-                track_list.append(parse_track(track_url))
-    
-    return Album(url=url, tracks=track_list)
+            cells = row.find_all("td")
 
+            if len(cells) < 4:
+                continue
 
-def parse_track(url: str) -> Track:
-    response = requests.get(url)
+            title_cell = cells[3].find("a")
 
-    flac_url = None
-    mp3_url = None
+            if title_cell is None:
+                continue
 
-    if response.status_code == 200:
-            # Parse the HTML content using BeautifulSoup
-            soup = BeautifulSoup(response.text, "html.parser")
+            track_url = title_cell.get("href")
 
-            for p in soup.find_all("p"):
-                if "FLAC" in str(p.find("a").find("span").get_text):
-                        flac_url = str(p.find("a").get_text).split('href="')[1].split('">')[0]
-                elif "MP3" in str(p.find("a").find("span").get_text):
-                        mp3_url = str(p.find("a").get_text).split('href="')[1].split('">')[0]
+            if not track_url:
+                continue
 
-    return Track(
-        page_url=url,mp3_url=mp3_url,flac_url=flac_url
+            track_url = urljoin(BASE_URL, track_url)
+
+            tracks.append(Track(page_url=track_url))
+
+        except Exception:
+            # Skip malformed rows instead of crashing entire parse
+            continue
+
+    if not tracks:
+        raise ParseError(
+            f"No tracks found on album page: {url}"
+        )
+
+    return Album(
+        url=url,
+        tracks=tracks,
     )
+
+def get_soup(url: str) -> BeautifulSoup:
+    try:
+        response = requests.get(
+            url,
+            headers=HEADERS,
+            timeout=REQUEST_TIMEOUT,
+        )
+
+        response.raise_for_status()
+
+    except RequestException as e:
+        raise InvalidURLError(
+            f"Failed to fetch: {url}"
+        ) from e
+
+    return BeautifulSoup(response.text, "html.parser")
