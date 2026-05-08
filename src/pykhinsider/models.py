@@ -143,20 +143,21 @@ class Album:
             )
         
     
-    def download_all(self, format: str = "mp3") -> list[bytes]:
+    def download_all(self, format: str = "mp3", dest : str | None = None) -> None:
         """
         Download all tracks in the album in the specified format (mp3 or flac).
         Returns a list of binary content for each downloaded track.
         """
 
-        downloaded_tracks = []
+        if not dest:
+            dest = "."
 
         for track in self.tracks:
             try:
                 content = track.download(format=format)
-                downloaded_tracks.append(content)
+                filename = f"{dest}/{track.page_url.split('/')[-1]}"
+                with open(filename, "wb") as f:
+                    f.write(content)
             except Exception:
                 # Skip tracks that fail to download instead of crashing entire album download
                 continue
-
-        return downloaded_tracks
