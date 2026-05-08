@@ -1,14 +1,14 @@
 # pykhinsider
 
-Command line tool to download entire albums or individual songs from [KHinsider](https://downloads.khinsider.com) in both MP3 and FLAC format.
+Command line tool to download entire albums or individual songs from [KHInsider](https://downloads.khinsider.com) in both MP3 and FLAC format.
 
 It also works as a python package and you can use it directly in your own scripts.
 
 Note: this repository used to be called `khinsider-streamer`. It has since been completely overhauled from the ground up, and the streaming feature has been deprecated. 
 
 ## Features
-- Download any MP3 or FLAC track from KHinsider
-- Download any album from KHinsider
+- Download any MP3 or FLAC track from KHInsider
+- Download any album from KHInsider
 - Dump direct download links to stdout
 
 ## How To Install
@@ -100,6 +100,6 @@ When reporting bugs, please include:
 
 ## Notice
 
-* I am not affiliated with [KHinsider](https://downloads.khinsider.com/).
-* If you are affiliated with [KHinsider](https://downloads.khinsider.com/) and would like me to take down this repository, please contact me and I will do so.
+* I am not affiliated with [KHInsider](https://downloads.khinsider.com/).
+* If you are affiliated with [KHInsider](https://downloads.khinsider.com/) and would like me to take down this repository, please contact me and I will do so.
 * I do not endorse piracy.
