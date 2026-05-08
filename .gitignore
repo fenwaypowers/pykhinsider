@@ -1,5 +1,10 @@
-/khdl-temp
-test.py
-test2.py
-data/*.txt
-albums/*
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+*.mp3
+*.flac
