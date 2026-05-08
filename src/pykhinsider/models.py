@@ -1,6 +1,5 @@
 import os
 from urllib.parse import urljoin
-from bs4 import BeautifulSoup
 import requests
 
 from pykhinsider.constants import (
@@ -35,15 +34,7 @@ class Track:
         if self._resolved:
             return
 
-        response = requests.get(
-            self.page_url,
-            headers=HEADERS,
-            timeout=REQUEST_TIMEOUT,
-        )
-
-        response.raise_for_status()
-
-        soup = BeautifulSoup(response.text, "html.parser")
+        soup = get_soup(self.page_url)
 
         for link in soup.find_all("a", href=True):
             href = link["href"]
