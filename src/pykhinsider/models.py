@@ -102,7 +102,8 @@ class Track:
 
 class Album:
     def __init__(self, url: str):
-        self.url: str= url
+        self.url: str = url
+        self.title = url.split("/")[-1]
         self.tracks: list[Track] = []
 
         self._populated = False
@@ -157,6 +158,12 @@ class Album:
         """
         Download all tracks in the album to the specified destination.
         """
+
+        if not self.title:
+            self.title = "Unknown Album"
+
+        dest = os.path.join(dest, self.title)
+        os.makedirs(dest, exist_ok=True)
 
         if not self._populated:
             self.populate_tracks()
