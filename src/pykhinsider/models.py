@@ -89,6 +89,15 @@ class Track:
                 f.write(chunk)
 
         return filepath
+    
+    def print_ddl(self, format: str = "mp3") -> None:
+        if not self._resolved:
+            self.resolve()
+
+        url = self.mp3_url if format == "mp3" else self.flac_url
+
+        if url is not None:
+            print(url)
 
 
 class Album:
@@ -158,3 +167,11 @@ class Album:
             except Exception as e:
                 print(f"Failed to download track: {track.page_url}")
                 print(e)
+
+    
+    def print_all_ddl(self, format: str = "mp3") -> None:
+        if not self._populated:
+            self.populate_tracks()
+
+        for track in self.tracks:
+            track.print_ddl(format=format)
