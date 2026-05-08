@@ -56,7 +56,7 @@ class Track:
     def download(
         self,
         format: str = "mp3",
-        dest: str = ".",
+        dest: str = "."
     ) -> str:
         """
         Download the track and return the saved filepath.
