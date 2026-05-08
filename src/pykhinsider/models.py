@@ -95,7 +95,8 @@ class Album:
     def __init__(self, url: str):
         self.url: str= url
         self.tracks: list[Track] = []
-        self.populate_tracks()
+
+        self._populated = False
     
 
     @property
@@ -104,6 +105,9 @@ class Album:
     
 
     def populate_tracks(self) -> None:
+        if self._populated:
+            return
+
         soup = get_soup(self.url)
 
         for row in soup.find_all("tr"):
@@ -145,9 +149,12 @@ class Album:
         Download all tracks in the album to the specified destination.
         """
 
+        if not self._populated:
+            self.populate_tracks()
+
         for track in self.tracks:
             try:
                 track.download(format=format, dest=dest)
-            except Exception:
-                # Skip tracks that fail to download instead of crashing entire album download
-                continue
+            except Exception as e:
+                print(f"Failed to download track: {track.page_url}")
+                print(e)
