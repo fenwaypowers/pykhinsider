@@ -1,15 +1,18 @@
 from dataclasses import dataclass, field
 from typing import Optional
+from urllib.parse import urljoin
 
 
 from bs4 import BeautifulSoup
 import requests
 
 from pykhinsider.constants import (
+    BASE_URL,
     HEADERS,
     REQUEST_TIMEOUT,
 )
 from pykhinsider.exceptions import ParseError
+from pykhinsider.utils import get_soup
 
 
 class Track:
@@ -59,12 +62,49 @@ class Track:
 
         self._resolved = True
 
-@dataclass(slots=True)
+
 class Album:
-    url: str
-
-    tracks: list[Track] = field(default_factory=list)
-
+    def __init__(self, url: str):
+        self.url: str= url
+        self.tracks: list[Track] = []
+        self.populate_tracks()
+    
     @property
     def track_count(self) -> int:
         return len(self.tracks)
+    
+    def populate_tracks(self) -> None:
+        soup = get_soup(self.url)
+
+        for row in soup.find_all("tr"):
+            try:
+                if "play track" not in row.get_text().lower():
+                    continue
+
+                cells = row.find_all("td")
+
+                if len(cells) < 4:
+                    continue
+
+                title_cell = cells[3].find("a")
+
+                if title_cell is None:
+                    continue
+
+                track_url = title_cell.get("href")
+
+                if not track_url:
+                    continue
+
+                track_url = urljoin(BASE_URL, track_url)
+
+                self.tracks.append(Track(page_url=track_url))
+
+            except Exception:
+                # Skip malformed rows instead of crashing entire parse
+                continue
+
+        if not self.tracks:
+            raise ParseError(
+                f"No tracks found on album page: {self.url}"
+            )
