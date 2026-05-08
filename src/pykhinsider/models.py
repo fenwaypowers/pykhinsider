@@ -125,17 +125,17 @@ class Album:
                 if row.find("div", class_="playTrack") is None:
                     continue
 
-                cells = row.find_all("td")
-
-                if len(cells) < 3:
-                    continue
-
-                title_cell = cells[2].find("a")
+                title_cell = row.find("td", class_="clickable-row")
 
                 if title_cell is None:
                     continue
 
-                track_url = title_cell.get("href")
+                link = title_cell.find("a")
+
+                if link is None:
+                    continue
+
+                track_url = link.get("href")
 
                 if not track_url:
                     continue
