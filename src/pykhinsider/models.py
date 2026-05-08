@@ -11,7 +11,6 @@ class Track:
 
 @dataclass(slots=True)
 class Album:
-    title: str
     url: str
 
     tracks: list[Track] = field(default_factory=list)
