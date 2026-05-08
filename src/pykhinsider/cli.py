@@ -94,6 +94,7 @@ def main():
                 album.download_all(
                     format=args.format,
                     dest=args.output,
+                    print_progress=True,
                 )
 
         # Track
@@ -106,6 +107,7 @@ def main():
                 track.download(
                     format=args.format,
                     dest=args.output,
+                    print_progress=True,
                 )
 
     except KeyboardInterrupt:
