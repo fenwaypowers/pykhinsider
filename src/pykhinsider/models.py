@@ -1,6 +1,8 @@
 import os
 from urllib.parse import urljoin
 import requests
+import sys
+import time
 
 from pykhinsider.constants import (
     BASE_URL,
@@ -56,7 +58,8 @@ class Track:
     def download(
         self,
         format: str = "mp3",
-        dest: str = "."
+        dest: str = ".",
+        print_progress: bool = False,
     ) -> str:
         """
         Download the track and return the saved filepath.
@@ -84,9 +87,48 @@ class Track:
         filename = url.split("/")[-1]
         filepath = os.path.join(dest, filename)
 
+        total_size = int(response.headers.get("content-length", 0))
+        downloaded = 0
+
+        start_time = time.time()
+
         with open(filepath, "wb") as f:
             for chunk in response.iter_content(chunk_size=8192):
+                if not chunk:
+                    continue
+
                 f.write(chunk)
+
+                if print_progress:
+                    downloaded += len(chunk)
+
+                    elapsed = max(time.time() - start_time, 0.001)
+
+                    speed = downloaded / elapsed  # bytes/sec
+
+                    percent = (
+                        (downloaded / total_size) * 100
+                        if total_size > 0
+                        else 0
+                    )
+
+                    downloaded_mb = downloaded / (1024 * 1024)
+                    total_mb = total_size / (1024 * 1024)
+                    speed_mb = speed / (1024 * 1024)
+
+                    sys.stdout.write(
+                        (
+                            f"\r{filename} | "
+                            f"{percent:6.2f}% | "
+                            f"{downloaded_mb:7.2f}/{total_mb:.2f} MB | "
+                            f"{speed_mb:.2f} MB/s"
+                        )
+                    )
+
+                    sys.stdout.flush()
+
+        if print_progress:
+            print()
 
         return filepath
     
@@ -155,7 +197,7 @@ class Album:
         self._populated = True
         
     
-    def download_all(self, format: str = "mp3", dest : str = ".") -> None:
+    def download_all(self, format: str = "mp3", dest : str = ".", print_progress: bool = False) -> None:
         """
         Download all tracks in the album to the specified destination.
         """
@@ -171,7 +213,7 @@ class Album:
 
         for track in self.tracks:
             try:
-                track.download(format=format, dest=dest)
+                track.download(format=format, dest=dest, print_progress=print_progress)
             except Exception as e:
                 print(f"Failed to download track: {track.page_url}")
                 print(e)
