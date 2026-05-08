@@ -4,6 +4,8 @@ Command line tool to download entire albums or individual songs from [KHinsider]
 
 It also works as a python package and you can use it directly in your own scripts.
 
+Note: this repository used to be called `khinsider-streamer`. It has since been completely overhauled from the ground up, and the streaming feature has been deprecated. 
+
 ## Features
 - Download any MP3 or FLAC track from KHinsider
 - Download any album from KHinsider
@@ -18,6 +20,14 @@ It also works as a python package and you can use it directly in your own script
 - Simply download the most recent binary from the [Releases tab](https://github.com/fenwaypowers/pykhinsider/releases).
 
 ## Command-Line Use
+
+### Command to download an album (in FLAC format)
+
+`pykhinsider "https://downloads.khinsider.com/game-soundtracks/album/wii-music-collection/" --format flac`
+
+### Command to download an individual track (defaults to MP3)
+
+`pykhinsider "https://downloads.khinsider.com/game-soundtracks/album/wii-music-collection/03.%2520Mii%2520Channel.mp3"`
 
 ```
 usage: pykhinsider [-h] [-f {mp3,flac}] [-o OUTPUT] [--dump-links] url
