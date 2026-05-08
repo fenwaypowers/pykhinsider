@@ -97,3 +97,9 @@ When reporting bugs, please include:
 - the expected behavior
 - the actual behavior
 - the full error message
+
+## Notice
+
+* I am not affiliated with [KHinsider](https://downloads.khinsider.com/).
+* If you are affiliated with [KHinsider](https://downloads.khinsider.com/) and would like me to take down this repository, please contact me and I will do so.
+* I do not endorse piracy.
