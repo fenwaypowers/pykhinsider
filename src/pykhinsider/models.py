@@ -122,15 +122,15 @@ class Album:
 
         for row in soup.find_all("tr"):
             try:
-                if "play track" not in row.get_text().lower():
+                if row.find("div", class_="playTrack") is None:
                     continue
 
                 cells = row.find_all("td")
 
-                if len(cells) < 4:
+                if len(cells) < 3:
                     continue
 
-                title_cell = cells[3].find("a")
+                title_cell = cells[2].find("a")
 
                 if title_cell is None:
                     continue
@@ -145,13 +145,14 @@ class Album:
                 self.tracks.append(Track(page_url=track_url))
 
             except Exception:
-                # Skip malformed rows instead of crashing entire parse
                 continue
 
         if not self.tracks:
             raise ParseError(
                 f"No tracks found on album page: {self.url}"
             )
+
+        self._populated = True
         
     
     def download_all(self, format: str = "mp3", dest : str = ".") -> None:
