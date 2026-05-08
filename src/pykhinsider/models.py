@@ -22,11 +22,9 @@ class Track:
 
         self._resolved = False
 
-
     @property
     def resolved(self) -> bool:
         return self._resolved
-
 
     def resolve(self) -> None:
         """
@@ -48,12 +46,9 @@ class Track:
                 self.flac_url = href
 
         if self.mp3_url is None and self.flac_url is None:
-            raise ParseError(
-                f"No downloadable links found: {self.page_url}"
-            )
+            raise ParseError(f"No downloadable links found: {self.page_url}")
 
         self._resolved = True
-
 
     def download(
         self,
@@ -106,11 +101,7 @@ class Track:
 
                     speed = downloaded / elapsed  # bytes/sec
 
-                    percent = (
-                        (downloaded / total_size) * 100
-                        if total_size > 0
-                        else 0
-                    )
+                    percent = (downloaded / total_size) * 100 if total_size > 0 else 0
 
                     downloaded_mb = downloaded / (1024 * 1024)
                     total_mb = total_size / (1024 * 1024)
@@ -131,7 +122,7 @@ class Track:
             print()
 
         return filepath
-    
+
     def print_ddl(self, format: str = "mp3") -> None:
         if not self._resolved:
             self.resolve()
@@ -149,12 +140,10 @@ class Album:
         self.tracks: list[Track] = []
 
         self._populated = False
-    
 
     @property
     def track_count(self) -> int:
         return len(self.tracks)
-    
 
     def populate_tracks(self) -> None:
         if self._populated:
@@ -190,14 +179,13 @@ class Album:
                 continue
 
         if not self.tracks:
-            raise ParseError(
-                f"No tracks found on album page: {self.url}"
-            )
+            raise ParseError(f"No tracks found on album page: {self.url}")
 
         self._populated = True
-        
-    
-    def download_all(self, format: str = "mp3", dest : str = ".", print_progress: bool = False) -> None:
+
+    def download_all(
+        self, format: str = "mp3", dest: str = ".", print_progress: bool = False
+    ) -> None:
         """
         Download all tracks in the album to the specified destination.
         """
@@ -218,7 +206,6 @@ class Album:
                 print(f"Failed to download track: {track.page_url}")
                 print(e)
 
-    
     def print_all_ddl(self, format: str = "mp3") -> None:
         if not self._populated:
             self.populate_tracks()
