@@ -1,3 +1,4 @@
+import os
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 import requests
@@ -61,22 +62,19 @@ class Track:
         self._resolved = True
 
 
-    def download(self, format: str = "mp3") -> bytes:
+    def download(
+        self,
+        format: str = "mp3",
+        dest: str = ".",
+    ) -> str:
         """
-        Download the track in the specified format (mp3 or flac).
+        Download the track and return the saved filepath.
         """
 
         if not self._resolved:
             self.resolve()
 
-        url = None
-
-        if format == "mp3":
-            url = self.mp3_url
-        elif format == "flac":
-            url = self.flac_url
-        else:
-            raise ValueError(f"Unsupported format: {format}")
+        url = self.mp3_url if format == "mp3" else self.flac_url
 
         if url is None:
             raise ParseError(
@@ -87,11 +85,19 @@ class Track:
             url,
             headers=HEADERS,
             timeout=REQUEST_TIMEOUT,
+            stream=True,
         )
 
         response.raise_for_status()
 
-        return response.content
+        filename = url.split("/")[-1]
+        filepath = os.path.join(dest, filename)
+
+        with open(filepath, "wb") as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+
+        return filepath
 
 
 class Album:
@@ -143,21 +149,14 @@ class Album:
             )
         
     
-    def download_all(self, format: str = "mp3", dest : str | None = None) -> None:
+    def download_all(self, format: str = "mp3", dest : str = ".") -> None:
         """
-        Download all tracks in the album in the specified format (mp3 or flac).
-        Returns a list of binary content for each downloaded track.
+        Download all tracks in the album to the specified destination.
         """
-
-        if not dest:
-            dest = "."
 
         for track in self.tracks:
             try:
-                content = track.download(format=format)
-                filename = f"{dest}/{track.page_url.split('/')[-1]}"
-                with open(filename, "wb") as f:
-                    f.write(content)
+                track.download(format=format, dest=dest)
             except Exception:
                 # Skip tracks that fail to download instead of crashing entire album download
                 continue
