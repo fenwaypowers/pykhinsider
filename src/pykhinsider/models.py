@@ -1,5 +1,6 @@
 import os
 from urllib.parse import urljoin
+from urllib.parse import unquote
 import requests
 import sys
 import time
@@ -79,7 +80,7 @@ class Track:
 
         response.raise_for_status()
 
-        filename = url.split("/")[-1]
+        filename = unquote(url.split("/")[-1])
         filepath = os.path.join(dest, filename)
 
         total_size = int(response.headers.get("content-length", 0))
