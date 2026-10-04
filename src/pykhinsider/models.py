@@ -14,6 +14,12 @@ from pykhinsider.exceptions import ParseError
 from pykhinsider.utils import get_soup
 
 
+def sanitize_filename(name: str) -> str:
+    invalid = '<>:"/\\|?*'
+    sanitized = "".join("_" if char in invalid else char for char in name)
+    return sanitized.strip().rstrip(".")
+
+
 class Track:
     def __init__(self, page_url: str):
         self.page_url = page_url
@@ -81,6 +87,7 @@ class Track:
         response.raise_for_status()
 
         filename = unquote(url.split("/")[-1])
+        filename = sanitize_filename(filename)
         filepath = os.path.join(dest, filename)
 
         total_size = int(response.headers.get("content-length", 0))
