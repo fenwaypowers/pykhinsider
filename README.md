@@ -4,7 +4,9 @@ Command line tool to download entire albums or individual songs from [KHInsider]
 
 It also works as a python package and you can use it directly in your own scripts.
 
-Note: this repository used to be called `khinsider-streamer`. It has since been completely overhauled from the ground up, and the streaming feature has been deprecated. 
+Notes:
+- If you get `403 Client Error: Forbidden`, then you can use the `--flaresolverr` option to specify a flaresolverr server to bypass the cloudflare bot challenge.
+- this repository used to be called `khinsider-streamer`. It has since been completely overhauled from the ground up, and the streaming feature has been deprecated. 
 
 ## Features
 - Download any MP3 or FLAC track from KHInsider
@@ -29,8 +31,8 @@ Note: this repository used to be called `khinsider-streamer`. It has since been 
 
 `pykhinsider "https://downloads.khinsider.com/game-soundtracks/album/wii-music-collection/03.%2520Mii%2520Channel.mp3"`
 
-```
-usage: pykhinsider [-h] [-f {mp3,flac}] [-o OUTPUT] [--dump-links] url
+```bash
+usage: pykhinsider [-h] [-f {mp3,flac}] [-o OUTPUT] [--flaresolverr FLARESOLVERR] [--dump-links] url
 
 Download music from KHInsider.
 
@@ -39,10 +41,11 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -f {mp3,flac}, --format {mp3,flac}
+  -f, --format {mp3,flac}
                         audio format to download
-  -o OUTPUT, --output OUTPUT
-                        output directory
+  -o, --output OUTPUT   output directory
+  --flaresolverr, -fs FLARESOLVERR
+                        URL of the FlareSolverr service
   --dump-links, --print-links
                         print direct download links only
 ```
