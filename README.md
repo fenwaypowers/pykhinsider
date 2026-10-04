@@ -5,7 +5,7 @@ Command line tool to download entire albums or individual songs from [KHInsider]
 It also works as a python package and you can use it directly in your own scripts.
 
 Notes:
-- If you get `403 Client Error: Forbidden`, then you can use the `--flaresolverr` option to specify a flaresolverr server to bypass the cloudflare bot challenge.
+- If you get `403 Client Error: Forbidden`, then you can use the `--flaresolverr` option to specify a [flaresolverr](https://github.com/Flaresolverr/Flaresolverr) server to bypass the cloudflare bot challenge.
 - this repository used to be called `khinsider-streamer`. It has since been completely overhauled from the ground up, and the streaming feature has been deprecated. 
 
 ## Features
