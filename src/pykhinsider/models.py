@@ -193,7 +193,11 @@ class Album:
         self._populated = True
 
     def download_all(
-        self, format: str = "mp3", dest: str = ".", print_progress: bool = False, flaresolverr_url: str = None
+        self,
+        format: str = "mp3",
+        dest: str = ".",
+        print_progress: bool = False,
+        flaresolverr_url: str = None,
     ) -> None:
         """
         Download all tracks in the album to the specified destination.
