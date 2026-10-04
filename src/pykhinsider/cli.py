@@ -72,10 +72,7 @@ def main():
     )
 
     parser.add_argument(
-        "--flaresolverr",
-        "-fs",
-        help="URL of the FlareSolverr service",
-        default=None
+        "--flaresolverr", "-fs", help="URL of the FlareSolverr service", default=None
     )
 
     parser.add_argument(

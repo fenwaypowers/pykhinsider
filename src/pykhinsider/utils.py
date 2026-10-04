@@ -2,10 +2,7 @@ import requests
 
 from bs4 import BeautifulSoup
 
-from pykhinsider.constants import (
-    HEADERS,
-    REQUEST_TIMEOUT
-)
+from pykhinsider.constants import HEADERS, REQUEST_TIMEOUT
 
 session = requests.Session()
 session.headers.update(HEADERS)
@@ -41,9 +38,7 @@ def get_flaresolverr(flaresolverr_url: str, url: str) -> requests.Response:
         ) from e
 
     if js.get("status") != "ok" or "solution" not in js:
-        raise RuntimeError(
-            f"FlareSolverr failed: {js.get('message', 'Unknown error')}"
-        )
+        raise RuntimeError(f"FlareSolverr failed: {js.get('message', 'Unknown error')}")
 
     solution = js["solution"]
 
@@ -70,7 +65,9 @@ def get(url: str, **kwargs):
 def get_soup(url: str, flaresolverr_url: str = None) -> BeautifulSoup:
     response = get(url)
     if response.status_code == 403 and flaresolverr_url:
-        print(f"Got 403 Access forbidden error, trying FlareSolverr at {flaresolverr_url}")
+        print(
+            f"Got 403 Access forbidden error, trying FlareSolverr at {flaresolverr_url}"
+        )
         response = get_flaresolverr(flaresolverr_url, url)
         _persist_cookies(response)
     response.raise_for_status()
