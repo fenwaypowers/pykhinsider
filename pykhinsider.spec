@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['src\\pykhinsider\\__main__.py'],
+    ['src/pykhinsider/__main__.py'],
     pathex=[],
     binaries=[],
     datas=[],
