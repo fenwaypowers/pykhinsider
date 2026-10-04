@@ -142,12 +142,13 @@ class Track:
 
 
 class Album:
-    def __init__(self, url: str):
+    def __init__(self, url: str, flaresolverr_url: str = None):
         self.url: str = url
         self.title = url.split("/")[-1]
         self.tracks: list[Track] = []
 
         self._populated = False
+        self.flaresolverr_url = flaresolverr_url
 
     @property
     def track_count(self) -> int:
@@ -157,7 +158,7 @@ class Album:
         if self._populated:
             return
 
-        soup = get_soup(self.url)
+        soup = get_soup(self.url, flaresolverr_url=self.flaresolverr_url)
 
         for row in soup.find_all("tr"):
             try:
@@ -192,7 +193,7 @@ class Album:
         self._populated = True
 
     def download_all(
-        self, format: str = "mp3", dest: str = ".", print_progress: bool = False
+        self, format: str = "mp3", dest: str = ".", print_progress: bool = False, flaresolverr_url: str = None
     ) -> None:
         """
         Download all tracks in the album to the specified destination.

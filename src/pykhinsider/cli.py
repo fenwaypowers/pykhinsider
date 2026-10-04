@@ -72,6 +72,13 @@ def main():
     )
 
     parser.add_argument(
+        "--flaresolverr",
+        "-fs",
+        help="URL of the FlareSolverr service",
+        default=None
+    )
+
+    parser.add_argument(
         "--dump-links",
         "--print-links",
         action="store_true",
@@ -86,7 +93,7 @@ def main():
 
         # Album
         if url_type == "album":
-            album = Album(url)
+            album = Album(url, flaresolverr_url=args.flaresolverr)
 
             if args.dump_links:
                 album.print_all_ddl(format=args.format)
