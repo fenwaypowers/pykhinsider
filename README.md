@@ -21,7 +21,7 @@ Notes:
 pip install pykhinsider
 ```
 
-### Windows:
+### Windows
 - Simply download the most recent `.exe` file from the [Releases tab](https://github.com/fenwaypowers/pykhinsider/releases).
 
 ### Linux
