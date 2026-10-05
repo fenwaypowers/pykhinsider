@@ -52,9 +52,11 @@ options:
 
 ## Install as a package
 
-Make sure you have Python 3.10 or later installed.
-
-Clone the repository and install locally:
+Make sure you have Python 3.10 or later installed. Then, run:
+```bash
+pip install pykhinsider
+```
+Or, clone the repository and install locally:
 
 ```bash
 git clone https://github.com/fenwaypowers/pykhinsider
