@@ -8,7 +8,8 @@ version = "2.2.0"
 description = "Download albums and tracks from KHInsider"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { file = "LICENSE" }
+license = "MIT"
+license-files = ["LICENSE"]
 
 authors = [
     { name = "Fenway Powers" }
