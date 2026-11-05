@@ -4,6 +4,7 @@ from urllib.parse import unquote
 import requests
 import sys
 import time
+from typing import Callable
 
 from pykhinsider.constants import (
     BASE_URL,
@@ -20,9 +21,21 @@ def sanitize_filename(name: str) -> str:
     return sanitized.strip().rstrip(".")
 
 
+def _with_position(
+    callback: Callable[[str], None], index: int, total: int
+) -> Callable[[str], None]:
+    """Wrap callback so each message is suffixed with "| index/total"."""
+
+    def wrapped(msg: str) -> None:
+        callback(f"{msg} | {index}/{total}")
+
+    return wrapped
+
+
 class Track:
-    def __init__(self, page_url: str):
+    def __init__(self, page_url: str, flaresolverr_url: str | None = None):
         self.page_url = page_url
+        self.flaresolverr_url = flaresolverr_url
 
         self.mp3_url: str | None = None
         self.flac_url: str | None = None
@@ -41,7 +54,7 @@ class Track:
         if self._resolved:
             return
 
-        soup = get_soup(self.page_url)
+        soup = get_soup(self.page_url, flaresolverr_url=self.flaresolverr_url)
 
         for link in soup.find_all("a", href=True):
             href = link.get("href")
@@ -65,6 +78,7 @@ class Track:
         format: str = "mp3",
         dest: str = ".",
         print_progress: bool = False,
+        progress_callback: Callable[[str], None] | None = None,
     ) -> str:
         """
         Download the track and return the saved filepath.
@@ -105,7 +119,7 @@ class Track:
 
                 f.write(chunk)
 
-                if print_progress:
+                if print_progress or progress_callback:
                     downloaded += len(chunk)
 
                     elapsed = max(time.time() - start_time, 0.001)
@@ -118,16 +132,19 @@ class Track:
                     total_mb = total_size / (1024 * 1024)
                     speed_mb = speed / (1024 * 1024)
 
-                    sys.stdout.write(
-                        (
-                            f"\r{filename} | "
-                            f"{percent:6.2f}% | "
-                            f"{downloaded_mb:7.2f}/{total_mb:.2f} MB | "
-                            f"{speed_mb:.2f} MB/s"
-                        )
+                    message = (
+                        f"{filename} | "
+                        f"{percent:6.2f}% | "
+                        f"{downloaded_mb:7.2f}/{total_mb:.2f} MB | "
+                        f"{speed_mb:.2f} MB/s"
                     )
 
-                    sys.stdout.flush()
+                    if progress_callback:
+                        progress_callback(message)
+
+                    if print_progress:
+                        sys.stdout.write(f"\r{message}")
+                        sys.stdout.flush()
 
         if print_progress:
             print()
@@ -185,7 +202,9 @@ class Album:
 
                 track_url = urljoin(BASE_URL, track_url)
 
-                self.tracks.append(Track(page_url=track_url))
+                self.tracks.append(
+                    Track(page_url=track_url, flaresolverr_url=self.flaresolverr_url)
+                )
 
             except Exception:
                 continue
@@ -201,10 +220,17 @@ class Album:
         dest: str = ".",
         print_progress: bool = False,
         flaresolverr_url: str | None = None,
+        progress_callback: Callable[[str], None] | None = None,
     ) -> None:
         """
         Download all tracks in the album to the specified destination.
+
+        If given, progress_callback receives each track's progress message
+        suffixed with the track's position in the album (e.g. "| 3/12").
         """
+
+        if flaresolverr_url:
+            self.flaresolverr_url = flaresolverr_url
 
         if not self.title:
             self.title = "Unknown Album"
@@ -215,9 +241,23 @@ class Album:
         if not self._populated:
             self.populate_tracks()
 
-        for track in self.tracks:
+        total = len(self.tracks)
+
+        for index, track in enumerate(self.tracks, start=1):
+            track_callback = (
+                _with_position(progress_callback, index, total)
+                if progress_callback
+                else None
+            )
+
             try:
-                track.download(format=format, dest=dest, print_progress=print_progress)
+                track.flaresolverr_url = self.flaresolverr_url
+                track.download(
+                    format=format,
+                    dest=dest,
+                    print_progress=print_progress,
+                    progress_callback=track_callback,
+                )
             except Exception as e:
                 print(f"Failed to download track: {track.page_url}")
                 print(e)
