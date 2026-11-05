@@ -44,7 +44,10 @@ class Track:
         soup = get_soup(self.page_url)
 
         for link in soup.find_all("a", href=True):
-            href = link["href"]
+            href = link.get("href")
+
+            if not isinstance(href, str):
+                continue
 
             if href.endswith(".mp3"):
                 self.mp3_url = href
@@ -142,7 +145,7 @@ class Track:
 
 
 class Album:
-    def __init__(self, url: str, flaresolverr_url: str = None):
+    def __init__(self, url: str, flaresolverr_url: str | None = None):
         self.url: str = url
         self.title = url.split("/")[-1]
         self.tracks: list[Track] = []
@@ -177,7 +180,7 @@ class Album:
 
                 track_url = link.get("href")
 
-                if not track_url:
+                if not isinstance(track_url, str) or not track_url:
                     continue
 
                 track_url = urljoin(BASE_URL, track_url)
@@ -197,7 +200,7 @@ class Album:
         format: str = "mp3",
         dest: str = ".",
         print_progress: bool = False,
-        flaresolverr_url: str = None,
+        flaresolverr_url: str | None = None,
     ) -> None:
         """
         Download all tracks in the album to the specified destination.
