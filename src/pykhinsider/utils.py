@@ -1,3 +1,5 @@
+from typing import Any
+
 import requests
 
 from bs4 import BeautifulSoup
@@ -18,7 +20,7 @@ def get_flaresolverr(flaresolverr_url: str, url: str) -> requests.Response:
     if not endpoint.endswith("/v1"):
         endpoint += "/v1"
 
-    data = {
+    data: dict[str, str | int] = {
         "cmd": "request.get",
         "url": url,
         "maxTimeout": 60000,
@@ -44,7 +46,7 @@ def get_flaresolverr(flaresolverr_url: str, url: str) -> requests.Response:
 
     mock = requests.Response()
     mock.status_code = solution["status"]
-    mock._content = solution["response"].encode("utf-8")
+    mock._content = solution["response"].encode("utf-8")  # pyright: ignore[reportPrivateUsage]
     mock.url = solution["url"]
     mock.headers.update(solution.get("headers", {}))
 
@@ -54,7 +56,7 @@ def get_flaresolverr(flaresolverr_url: str, url: str) -> requests.Response:
     return mock
 
 
-def get(url: str, **kwargs):
+def get(url: str, **kwargs: Any) -> requests.Response:
     return session.get(
         url,
         timeout=REQUEST_TIMEOUT,
@@ -62,7 +64,7 @@ def get(url: str, **kwargs):
     )
 
 
-def get_soup(url: str, flaresolverr_url: str = None) -> BeautifulSoup:
+def get_soup(url: str, flaresolverr_url: str | None = None) -> BeautifulSoup:
     response = get(url)
     if response.status_code == 403 and flaresolverr_url:
         print(
